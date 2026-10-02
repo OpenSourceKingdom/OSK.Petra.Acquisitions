@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+namespace OSK.Petra.Acquisitions.Models;
+
+public class AcquisitionChoiceState
+{
+    #region Variables
+
+    public required Guid AcquireableId { get; init; }
+
+    public long TotalAcquisitions { get; set; }
+
+    public Dictionary<Guid, AcquisitionHubQueueState> HubQueues { get; init; } = [];
+
+    #endregion
+
+    #region Api
+
+    public bool TryGetHubQueue(Guid hubId, [NotNullWhen(true)] out AcquisitionHubQueueState? hubQueue)
+        => HubQueues.TryGetValue(hubId, out hubQueue);
+
+    public AcquisitionHubQueueState GetOrAddHubQueue(Guid hubId)
+    {
+        if (!HubQueues.TryGetValue(hubId, out var hubQueue))
+        {
+            hubQueue = new AcquisitionHubQueueState
+            {
+                HubId = hubId
+            };
+            HubQueues[hubId] = hubQueue;
+        }
+
+        return hubQueue;
+    }
+
+    public bool RemoveHubQueue(Guid hubId)
+        => HubQueues.Remove(hubId);
+
+    #endregion
+}
