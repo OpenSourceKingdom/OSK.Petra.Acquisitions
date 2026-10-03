@@ -36,9 +36,9 @@ internal class AcquisitionHubGroup
 
     public int TotalHubs => _contexts.Count;
 
-    public IEnumerable<IAcquisitionHubContext> Contexts => _contexts.Values;
+    public IEnumerable<IAcquisitionHubLiaison> Contexts => _contexts.Values;
 
-    public IAcquisitionHubContext GetOrAddContext(IAcquisitionHub hub, OwnerAcquisitionState ownerAcquisitionState)
+    public IAcquisitionHubLiaison GetOrAddContext(IAcquisitionHub hub, OwnerAcquisitionState ownerAcquisitionState)
     {
         if (_contexts.TryGetValue(hub.Id, out var context))
         {
@@ -60,7 +60,7 @@ internal class AcquisitionHubGroup
         return context;
     }
 
-    public IAcquisitionHubContext? GetContext(Guid hubId)
+    public IAcquisitionHubLiaison? GetContext(Guid hubId)
         => _contexts.TryGetValue(hubId, out var context)
             ? context
             : null;

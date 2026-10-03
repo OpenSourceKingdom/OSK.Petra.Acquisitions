@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace OSK.Petra.Acquisitions.Internal.Models;
 
-internal class AcquisitionHubLiaison : IAcquisitionHubContext
+internal class AcquisitionHubLiaison : IAcquisitionHubLiaison
 {
     #region Variables
 
@@ -122,7 +122,7 @@ internal class AcquisitionHubLiaison : IAcquisitionHubContext
 
     }
 
-    public IEnumerable<AcquisitionChoiceInformation> GetChoices(IAcquirer acquirer)
+    public AcquirerChoiceContext GetChoices(IAcquirer acquirer)
     {
         throw new NotImplementedException();
     }

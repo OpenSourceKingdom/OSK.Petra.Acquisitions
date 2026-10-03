@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace OSK.Petra.Acquisitions.Models;
 
-public interface IAcquisitionHubContext
+public interface IAcquisitionHubLiaison
 {
     IAcquisitionHub Hub { get; }
 
-    IEnumerable<AcquisitionChoiceInformation> GetChoices(IAcquirer acquirer);
+    AcquirerChoiceContext GetChoices(IAcquirer acquirer);
 
     AcquisitionResult InitiateAcquisition(IAcquirer acquirer, IAcquireable acquireable, IEnumerable<Provision> provisions);
 

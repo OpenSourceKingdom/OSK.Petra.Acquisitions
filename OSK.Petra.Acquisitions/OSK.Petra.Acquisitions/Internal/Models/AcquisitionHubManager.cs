@@ -30,14 +30,14 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
         }
     }
 
-    public IEnumerable<IAcquisitionHubContext> GetHubContexts(Guid[]? hubIdFilter)
+    public IEnumerable<IAcquisitionHubLiaison> GetHubContexts(Guid[]? hubIdFilter)
     {
         return hubIdFilter is { Length: > 0 }
             ? hubIdFilter.Where(groupId => _hubGroups.TryGetValue(groupId, out _)).SelectMany(groupId => _hubGroups[groupId].Contexts)
             : _hubGroups.Values.SelectMany(group => group.Contexts);
     }
 
-    public IAcquisitionHubContext GetOrAddHub(IAcquisitionHub hub)
+    public IAcquisitionHubLiaison GetOrAddHub(IAcquisitionHub hub)
     {
         if (!_hubGroups.TryGetValue(hub.GroupId, out var hubGroup))
         {

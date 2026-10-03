@@ -16,9 +16,9 @@ public interface IAcquisitionSystem
 
     IEnumerable<OwnerAcquisitionState> GetStates();
 
-    IEnumerable<IAcquisitionHubContext> GetHubs(HubSearchOptions? searchOptions = null);
+    IEnumerable<IAcquisitionHubLiaison> GetHubs(HubSearchOptions? searchOptions = null);
 
-    IAcquisitionHubContext AddHub(IAcquisitionHub hub);
+    IAcquisitionHubLiaison AddHub(IAcquisitionHub hub);
 
     bool RemoveHub(IAcquisitionHub hub);
 

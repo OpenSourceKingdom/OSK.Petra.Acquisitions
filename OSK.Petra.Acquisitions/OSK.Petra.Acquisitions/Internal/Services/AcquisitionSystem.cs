@@ -32,7 +32,7 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
     public IEnumerable<OwnerAcquisitionState> GetStates()
         => _hubManagers.Values.Select(manager => manager.OwnerState);
 
-    public IAcquisitionHubContext AddHub(IAcquisitionHub hub)
+    public IAcquisitionHubLiaison AddHub(IAcquisitionHub hub)
     {
         if (hub is null)
         {
@@ -48,7 +48,7 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
         return manager.GetOrAddHub(hub);
     }
 
-    public IEnumerable<IAcquisitionHubContext> GetHubs(HubSearchOptions? searchOptions = null)
+    public IEnumerable<IAcquisitionHubLiaison> GetHubs(HubSearchOptions? searchOptions = null)
     {
         var managers = searchOptions?.OwnerIds is { Length :> 0 }
             ? searchOptions.Value.OwnerIds.Where(id => _hubManagers.TryGetValue(id, out _)).Select(id => _hubManagers[id])
