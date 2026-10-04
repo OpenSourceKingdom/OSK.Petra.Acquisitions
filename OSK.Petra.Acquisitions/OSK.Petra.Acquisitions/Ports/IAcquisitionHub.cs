@@ -16,7 +16,7 @@ public interface IAcquisitionHub
 
     AcquisitionHubConfiguration Configuration { get; }
 
-    IEnumerable<IAcquisitionChoice> GetChoiceAcquisitions();
+    IEnumerable<IAcquisitionDefinition> GetAcquisitions();
 
     void ProcessAcquisition(AcquisitionCompleteContext context);
 }

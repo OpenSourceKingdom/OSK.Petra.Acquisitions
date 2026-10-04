@@ -6,5 +6,5 @@ namespace OSK.Petra.Acquisitions.Ports;
 
 public interface IAcquisitionCostProvider
 {
-    IEnumerable<Provision> GetCost(AcquisitionProcessContext context);
+    IEnumerable<Provision> GetCost(HubAcquisitionContext context);
 }

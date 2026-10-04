@@ -1,7 +1,7 @@
 ﻿using OSK.Petra.Acquisitions.Models;
 using System;
 
-namespace OSK.Petra.Acquisitions.Holds;
+namespace OSK.Petra.Acquisitions.Holds.Timers;
 
 public class TimerHold : IAcquisitionHold
 {

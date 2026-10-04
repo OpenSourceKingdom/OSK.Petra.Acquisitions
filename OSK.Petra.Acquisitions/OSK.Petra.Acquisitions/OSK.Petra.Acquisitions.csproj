@@ -17,9 +17,4 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Events\" />
-		<Folder Include="Choices\" />
-	</ItemGroup>
-
 </Project>

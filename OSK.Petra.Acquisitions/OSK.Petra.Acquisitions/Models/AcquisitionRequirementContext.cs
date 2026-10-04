@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.Models;
 
-public class AcquisitionRequirementContext(IAcquirer acquirer, OwnerAcquisitionState ownerState)
+public class AcquisitionRequirementContext(IAcquirer acquirer, OwnerAcquisitionState ownerState, IServiceProvider serviceProvider)
 {
     #region Variables
+
+    IServiceProvider Services { get; } = serviceProvider;
 
     public IAcquirer Acquirer { get; } = acquirer;
 
@@ -17,8 +17,16 @@ public class AcquisitionRequirementContext(IAcquirer acquirer, OwnerAcquisitionS
 
     #region Api
 
-    public bool TryGetChoice(Guid acquireableId, [NotNullWhen(true)] out AcquisitionChoiceState? choiceState)
-        => OwnerState.AcquisitionChoices.TryGetValue(acquireableId, out choiceState);
+    public bool TryGetChoiceProgression(Guid pathAcquisitionId, Guid acquireableId, [NotNullWhen(true)] out AcquisitionTierProgression? tierProgression)
+    {
+        if (OwnerState.AcquisitionChoices.TryGetValue(pathAcquisitionId, out var pathState))
+        {
+            tierProgression = new(acquireableId, pathState.ChoiceStates[acquireableId].TotalAcquisitions);
+        }
+
+        tierProgression = null;
+        return false;
+    }
 
     #endregion
 }

@@ -14,5 +14,5 @@ public interface IAcquisitionHoldProvider
     /// </summary>
     /// <param name="context">The acquisition context to get a hold for</param>
     /// <returns>The acquisition hold, if one is needed</returns>
-    IAcquisitionHold? GetHold(AcquisitionProcessContext context);
+    IAcquisitionHold? GetHold(HubAcquisitionContext context);
 }

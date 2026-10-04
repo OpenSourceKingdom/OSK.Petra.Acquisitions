@@ -16,7 +16,7 @@ public class AcquisitionDependencyRequirement(IEnumerable<AcquisitionDependency>
             throw new ArgumentNullException(nameof(context));
         }
 
-        return dependencies.All(dependency => context.TryGetChoice(dependency.AcquireableId, out var choiceState) && choiceState.TotalAcquisitions >= dependency.RequiredAcquisitionCount);
+        return dependencies.All(dependency => context.TryGetChoiceProgression(dependency.AcquisitionPathId, dependency.AcquireableId, out var choiceTierProgression) && choiceTierProgression.Value.TotalAcquisitions >= dependency.RequiredAcquisitionCount);
     }
 
     #endregion

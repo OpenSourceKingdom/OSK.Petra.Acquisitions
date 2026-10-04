@@ -2,9 +2,8 @@
 using OSK.Petra.Acquisitions.Ports;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace OSK.Petra.Acquisitions.Internal.Models;
+namespace OSK.Petra.Acquisitions.Internal.Services;
 
 internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState ownerState, IServiceProvider serviceProvider)
 {
@@ -22,30 +21,23 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
 
     public int TotalGroups => _hubGroups.Count;
 
+    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    {
+        if (!_hubGroups.TryGetValue(hub.Id, out var group))
+        {
+            group = new(hub.GroupId, serviceProvider, ownerState);
+            _hubGroups[hub.GroupId] = group;
+        }
+
+        return group.GetAcquisitionView(hub, acquirer);
+    }
+
     public void Update(TimeSpan deltaTime)
     {
         foreach (var hubGroup in _hubGroups.Values)
         {
-            hubGroup.UpdateHubs(deltaTime);
+            hubGroup.Update(deltaTime);
         }
-    }
-
-    public IEnumerable<IAcquisitionHubLiaison> GetHubContexts(Guid[]? hubIdFilter)
-    {
-        return hubIdFilter is { Length: > 0 }
-            ? hubIdFilter.Where(groupId => _hubGroups.TryGetValue(groupId, out _)).SelectMany(groupId => _hubGroups[groupId].Contexts)
-            : _hubGroups.Values.SelectMany(group => group.Contexts);
-    }
-
-    public IAcquisitionHubLiaison GetOrAddHub(IAcquisitionHub hub)
-    {
-        if (!_hubGroups.TryGetValue(hub.GroupId, out var hubGroup))
-        {
-            hubGroup = new AcquisitionHubGroup(hub.GroupId, serviceProvider);
-            _hubGroups[hub.GroupId] = hubGroup;
-        }
-
-        return hubGroup.GetOrAddContext(hub, ownerState);
     }
 
     public bool RemoveHub(IAcquisitionHub hub)
@@ -54,11 +46,10 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
         {
             return false;
         }
-        if (!group.RemoveContext(hub))
+        if (!group.RemoveHub(hub))
         {
             return false;
         }
-
         if (group.TotalHubs is 0)
         {
             _hubGroups.Remove(group.HubGroupId);

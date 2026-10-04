@@ -1,5 +1,4 @@
-﻿using OSK.Petra.Acquisitions.Internal.Models;
-using OSK.Petra.Acquisitions.Models;
+﻿using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Options;
 using OSK.Petra.Acquisitions.Ports;
 using System;
@@ -32,29 +31,24 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
     public IEnumerable<OwnerAcquisitionState> GetStates()
         => _hubManagers.Values.Select(manager => manager.OwnerState);
 
-    public IAcquisitionHubLiaison AddHub(IAcquisitionHub hub)
+    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
     {
         if (hub is null)
         {
             throw new ArgumentNullException(nameof(hub));
         }
+        if (acquirer is null)
+        {
+            throw new ArgumentNullException(nameof(acquirer));
+        }
 
         if (!_hubManagers.TryGetValue(hub.OwnerId, out var manager))
         {
-            manager = new(hub.OwnerId, new() { OwnerId = hub.OwnerId }, serviceProvider);
+            manager = new AcquisitionOwnerHubManager(hub.OwnerId, new() { OwnerId = hub.OwnerId }, serviceProvider);
             _hubManagers[hub.OwnerId] = manager;
         }
 
-        return manager.GetOrAddHub(hub);
-    }
-
-    public IEnumerable<IAcquisitionHubLiaison> GetHubs(HubSearchOptions? searchOptions = null)
-    {
-        var managers = searchOptions?.OwnerIds is { Length :> 0 }
-            ? searchOptions.Value.OwnerIds.Where(id => _hubManagers.TryGetValue(id, out _)).Select(id => _hubManagers[id])
-            : _hubManagers.Values;
-
-        return managers.SelectMany(manager => manager.GetHubContexts(searchOptions?.HubGroupIds));
+        return manager.GetAcquisitionView(hub, acquirer);
     }
 
     public bool RemoveHub(IAcquisitionHub hub)

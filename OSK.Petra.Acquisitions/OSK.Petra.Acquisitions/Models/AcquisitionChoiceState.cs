@@ -35,6 +35,16 @@ public class AcquisitionChoiceState
         return hubQueue;
     }
 
+    public int GetTotalAcquisitionsInProgress(Guid hubId)
+        => HubQueues.TryGetValue(hubId, out var hubQueue)
+            ? hubQueue.AcquisitionsInProgress.Count
+            : 0;
+
+    public int GetTotalPendingAcquisitions(Guid hubId)
+        => HubQueues.TryGetValue(hubId, out var hubQueue)
+            ? hubQueue.PendingAcquisitions.Count
+            : 0;
+
     public bool RemoveHubQueue(Guid hubId)
         => HubQueues.Remove(hubId);
 
