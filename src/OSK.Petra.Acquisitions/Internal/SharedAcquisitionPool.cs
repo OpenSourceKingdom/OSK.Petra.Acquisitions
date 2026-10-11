@@ -1,5 +1,7 @@
 ﻿using OSK.Petra.Acquisitions.Internal.Models;
+using OSK.Petra.Acquisitions.Internal.Services;
 using OSK.Petra.Acquisitions.Models;
+using OSK.Petra.Acquisitions.Ports;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,10 +36,24 @@ internal static class SharedAcquisitionPool
             ? AcquisitionPathType.Multi
             : AcquisitionPathType.Single;
 
-        information = new AcquisitionInformation(definition, pathType, choiceTiers);
+        information = new AcquisitionInformation(definition, pathType, choiceTiers.SelectMany(kvp => kvp.Value.Select(definition => new ValueTuple<int, IAcquisitionDefinition>(kvp.Key, definition))));
         _choiceInformationLookup[definition.Acquireable.Id] = information;
 
         return information;
+    }
+
+    public static Acquisition GetAcquisition(AcquisitionHubGroup group, IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choiceDefinition, AcquisitionPathState pathState)
+    {
+        var tier = acquisitionInformation.Choices[choiceDefinition.Acquireable.Id].Tier;
+
+        if (acquisitionInformation.RootDefinition.Acquireable.Id == choiceDefinition.Acquireable.Id)
+        {
+            return choiceDefinition.NextChoices is null || choiceDefinition.NextChoices.Count is 0
+                ? new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, tier, pathState.ChoiceStates[choiceDefinition.Acquireable.Id])
+                : new AcquisitionPath(group, hub, acquirer, acquisitionInformation, pathState);
+        }
+
+        return new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, 0, pathState.ChoiceStates[choiceDefinition.Acquireable.Id]);
     }
 
     #endregion

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OSK.Petra.Acquisitions.Models;
+namespace OSK.Petra.Acquisitions.Internal.Models;
 
-public class AcquisitionPathState
+internal class AcquisitionPathState
 {
     #region Variables
 

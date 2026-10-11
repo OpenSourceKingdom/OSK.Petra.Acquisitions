@@ -25,7 +25,7 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
     public AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions)
         => hubGroup.InitiateAcquisition(hub, acquirer, pathAcquisition.Acquireable, choiceDefinition.Acquireable, provisions);
 
-    public IEnumerable<Provision> CancelAcquisition()
+    public AcquisitionCancellationResult CancelAcquisition()
         => hubGroup.CancelAcquisition(hub, acquirer, pathAcquisition.Acquireable, choiceDefinition.Acquireable);
 
     public IEnumerable<AcquisitionProgress> GetProgresses()
@@ -39,11 +39,15 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
 
     public bool IsComplete => choiceDefinition.Configuration.MaxAcquisitionCount.HasValue && choiceState.TotalAcquisitions >= choiceDefinition.Configuration.MaxAcquisitionCount;
 
+    public IReadOnlyCollection<IAcquisitionChoice> PreviousChoices { get; init; } = [];
+
+    public IReadOnlyCollection<IAcquisitionChoice> NextChoices { get; init; } = [];
+
     #endregion
 
-    #region Api
+    #region Acquisition Overrides
 
-    public void Update(IEnumerable<Provision> provisions)
+    public override void Update(IEnumerable<Provision> provisions)
     {
         IsAvailable = IsAvailable
             ? true

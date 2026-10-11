@@ -9,4 +9,6 @@ public interface IAcquisitionDefinition
     IAcquireable Acquireable { get; }
 
     ICollection<IAcquisitionDefinition> NextChoices { get; }
+
+    ICollection<IAcquisitionDefinition> PreviousChoices { get; }
 }

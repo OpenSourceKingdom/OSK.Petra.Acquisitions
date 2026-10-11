@@ -18,6 +18,10 @@ internal class AcquisitionView(IAcquisitionHub hub, IAcquirer acquirer, IEnumera
 
     public void Update(IEnumerable<Provision> provisions)
     {
+        foreach (var acquisition in acquisitions)
+        {
+            acquisition.Update(provisions);
+        }
     }
 
     #endregion

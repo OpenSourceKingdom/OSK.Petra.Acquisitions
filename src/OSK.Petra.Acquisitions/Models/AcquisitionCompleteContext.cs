@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace OSK.Petra.Acquisitions.Models;
 
-public class AcquisitionCompleteContext(IAcquirer acquirer, IAcquireable? acquireable, long acquiredAmount, IServiceProvider services)
+public class AcquisitionCompleteContext(IAcquirer acquirer, AcquisitionPathType? pathType, IAcquireable parentAcquireable, IAcquireable acquireable, long totalAcquired, bool success, IServiceProvider services)
 {
-    public bool AcquisitionSuccessful { get; } = acquireable is not null;
+    public bool IsPath => pathType is not null;
+
+    public IServiceProvider Services { get; } = services;
+
+    public bool Success { get; } = success;
 
     public IAcquirer Acquirer { get; } = acquirer;
 
-    [MemberNotNullWhen(true, nameof(AcquisitionSuccessful))]
-    public IAcquireable? Acquireable { get; } = acquireable;
+    public Guid PathId { get; } = parentAcquireable.Id;
 
-    public long AcquiredAmount { get; } = acquiredAmount;
+    public IAcquireable Acquireable { get; } = acquireable;
 
-    public IServiceProvider Services { get; } = services;
+    public long TotalAcquired { get; } = totalAcquired;
 }

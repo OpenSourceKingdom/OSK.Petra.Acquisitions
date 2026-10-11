@@ -2,6 +2,7 @@
 using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Options;
 using OSK.Petra.Acquisitions.Ports;
+using OSK.Petra.Provisions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,20 +17,32 @@ internal class AcquisitionPath(AcquisitionHubGroup hubGroup, IAcquisitionHub hub
 
     public IAcquireable RootAcquireable => information.RootDefinition.Acquireable;
 
-    public int TotalTiers => information.ChoiceTiers.Count;
+    public int TotalTiers => information.Choices.Count;
 
-    public int TotalChoices { get; } = information.ChoiceTiers.Sum(tier => tier.Value.Count);
+    public int TotalChoices => information.MaxTier;
 
     public IEnumerable<IAcquisitionChoice> GetChoices(AcquisitionPathSearchOptions? searchOptions = null)
     {
-        var searchableChoiceTiers = searchOptions is { TierFilter.Length :>= 1 }
-            ? searchOptions.Value.TierFilter.Where(tier => information.ChoiceTiers.TryGetValue(tier, out _)).SelectMany(tier => information.ChoiceTiers[tier])
-            : information.ChoiceTiers.SelectMany(kvp => kvp.Value);
+        var searchableChoices = searchOptions is { TierFilter.Length: >= 1 }
+            ? information.Choices.Values.Where(v => searchOptions.Value.TierFilter.Contains(v.Tier)).Select(v => v.Definition)
+            : information.Choices.Values.Select(v => v.Definition);
 
-        var acquisitionChoices = searchableChoiceTiers.Select(choice => information.ToAcquisition(hubGroup, hub, acquirer, state)).Cast<IAcquisitionChoice>();
+        var acquisitionChoices = searchableChoices.Select(choice => SharedAcquisitionPool.GetAcquisition(hubGroup, hub, acquirer, information, choice, state)).Cast<IAcquisitionChoice>();
         return searchOptions is { PredicateFilters.Length: >= 1 }
             ? acquisitionChoices.Where(choice => searchOptions.Value.PredicateFilters.All(predicate => predicate(choice)))
             : acquisitionChoices;
+    }
+
+    #endregion
+
+    #region Acquisition Overrides
+
+    public override void Update(IEnumerable<Provision> provisions)
+    {
+        foreach (var choice in GetChoices().OfType<AcquisitionChoice>())
+        {
+            choice.Update(provisions);
+        }
     }
 
     #endregion

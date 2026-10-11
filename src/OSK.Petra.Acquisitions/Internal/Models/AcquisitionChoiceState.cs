@@ -1,10 +1,11 @@
-﻿using System;
+﻿using OSK.Petra.Acquisitions.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace OSK.Petra.Acquisitions.Models;
+namespace OSK.Petra.Acquisitions.Internal.Models;
 
-public class AcquisitionChoiceState
+internal class AcquisitionChoiceState
 {
     #region Variables
 
@@ -25,10 +26,7 @@ public class AcquisitionChoiceState
     {
         if (!HubQueues.TryGetValue(hubId, out var hubQueue))
         {
-            hubQueue = new AcquisitionHubQueueState
-            {
-                HubId = hubId
-            };
+            hubQueue = new();
             HubQueues[hubId] = hubQueue;
         }
 

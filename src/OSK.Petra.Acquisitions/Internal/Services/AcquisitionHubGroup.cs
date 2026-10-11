@@ -50,13 +50,14 @@ internal class AcquisitionHubGroup
         return new(hub, acquirer, choiceDefinition.Acquireable, choiceState.TotalAcquisitions, choiceState.TryGetHubQueue(hub.Id, out var hubQueue) ? hubQueue.TotalQueuedAcquisitions : 0, _hubs.Count, ServiceProvider);
     }
 
-    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    public void AddHub(IAcquisitionHub hub, AcquisitionHubState? hubState = null)
     {
-        if (!_hubs.TryGetValue(hub.Id, out _))
+        if (_hubs.TryGetValue(hub.Id, out _))
         {
-            _hubs[hub.Id] = hub;
+            return;
         }
 
+        _hubs[hub.Id] = hub;
         if (!_initialized)
         {
             foreach (var acquisition in hub.GetAcquisitions())
@@ -66,10 +67,30 @@ internal class AcquisitionHubGroup
 
             _initialized = true;
         }
+        if (hubState is not null)
+        {
+            foreach (var choiceStateKvp in hubState.ChoiceStates)
+            {
+                if (!_acquisitionInformationStatePairs.TryGetValue(choiceStateKvp.Value.PathId, out var pathInformationPair))
+                {
+                    continue;
+                }
+                if (!pathInformationPair.PathState.ChoiceStates.TryGetValue(choiceStateKvp.Value.AcquireableId, out var choiceState))
+                {
+                    continue;
+                }
 
-        _hubs[hub.Id] = hub;
+                choiceState.TotalAcquisitions += choiceStateKvp.Value.TotalAcquisitions;
+                choiceState.HubQueues[hub.Id] = choiceStateKvp.Value.QueueState;
+            }
+        }
+    }
 
-        return new AcquisitionView(hub, acquirer, _acquisitionInformationStatePairs.Values.Select(pair => pair.AcquisitionInformation.ToAcquisition(this, hub, acquirer, pair.PathState)));
+    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    {
+        AddHub(hub);
+
+        return new AcquisitionView(hub, acquirer, _acquisitionInformationStatePairs.Select(kvp => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState)));
     }
 
     public AcquisitionResult InitiateAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable selectedAcquireable, IEnumerable<Provision> provisions)
@@ -123,7 +144,7 @@ internal class AcquisitionHubGroup
         var acquisitionHold = choiceDefinition.Configuration.AcquisitionHoldProvider?.GetHold(acquisitionContext);
         if (acquisitionHold is null)
         {
-            CompleteAcquisition(hub, acquirer, choiceDefinition, choiceState, AcquisitionHoldStatus.Released);
+            CompleteAcquisition(hub, acquirer, informationStatePair.AcquisitionInformation, choiceDefinition, choiceState, AcquisitionHoldStatus.Released);
             return AcquisitionResult.Acquired(choiceDefinition.Acquireable, provisionExpenditureSummmary);
         }
 
@@ -138,7 +159,7 @@ internal class AcquisitionHubGroup
         return AcquisitionResult.Delayed(provisionExpenditureSummmary);
     }
 
-    public IEnumerable<Provision> CancelAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable canceledAcquireable)
+    public AcquisitionCancellationResult CancelAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable canceledAcquireable)
     {
         if (acquirer is null)
         {
@@ -158,7 +179,7 @@ internal class AcquisitionHubGroup
 
         if (!choiceState.TryGetHubQueue(hub.Id, out var hubQueue))
         {
-            return [];
+            return new([]);
         }
 
         var removedHold = hubQueue.RemoveAcquisition(acquirer);
@@ -168,8 +189,8 @@ internal class AcquisitionHubGroup
         }
 
         return removedHold is null
-            ? []
-            : removedHold.RequiredProvisions;
+            ? new ([])
+            : new (removedHold.RequiredProvisions);
 
     }
 
@@ -190,7 +211,8 @@ internal class AcquisitionHubGroup
 
     public void Update(TimeSpan deltaTime)
     {
-        var choiceStatePairs = _acquisitionInformationStatePairs.SelectMany(pair => pair.Value.PathState.ChoiceStates.Values.Select(state => new { ChoiceState = state, Choice = pair.Value.AcquisitionInformation.GetChoiceDefinition(state.AcquireableId) }))
+        var choiceStatePairs = _acquisitionInformationStatePairs.SelectMany(pair 
+            => pair.Value.PathState.ChoiceStates.Values.Select(state => new { AcquisitionInformation = pair.Value.AcquisitionInformation, ChoiceState = state, Choice = pair.Value.AcquisitionInformation.GetChoiceDefinition(state.AcquireableId) }))
                                                  .Where(pair => pair.ChoiceState is not null);
 
         foreach (var hub in _hubs.Values)
@@ -214,7 +236,7 @@ internal class AcquisitionHubGroup
                     if (holdStatus is not AcquisitionHoldStatus.Active)
                     {
                         hubQueue.AcquisitionsInProgress.RemoveAt(index);
-                        CompleteAcquisition(hub, acquisitionHoldState.Acquirer, pair.Choice!, pair.ChoiceState, holdStatus);
+                        CompleteAcquisition(hub, acquisitionHoldState.Acquirer, pair.AcquisitionInformation, pair.Choice!, pair.ChoiceState, holdStatus);
                     }
                 }
             }
@@ -266,14 +288,15 @@ internal class AcquisitionHubGroup
             : false;
     }
 
-    private void CompleteAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquisitionDefinition choice, AcquisitionChoiceState state, AcquisitionHoldStatus holdStatus)
+    private void CompleteAcquisition(IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choice, AcquisitionChoiceState state, AcquisitionHoldStatus holdStatus)
     {
         if (holdStatus is AcquisitionHoldStatus.Released)
         {
             state.TotalAcquisitions++;
         }
 
-        hub.ProcessAcquisition(new(acquirer, holdStatus is AcquisitionHoldStatus.Released ? choice.Acquireable : null, state.TotalAcquisitions, ServiceProvider));
+        var success = holdStatus is AcquisitionHoldStatus.Released;
+        hub.ProcessAcquisition(new(acquirer, acquisitionInformation.PathType, acquisitionInformation.RootDefinition.Acquireable, choice.Acquireable, state.TotalAcquisitions, success, ServiceProvider));
 
         if (state.TryGetHubQueue(hub.Id, out var hubQueue))
         {

@@ -23,5 +23,9 @@ public interface IAcquisitionChoice: IAcquisition
 
     AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions);
 
-    IEnumerable<Provision> CancelAcquisition();
+    AcquisitionCancellationResult CancelAcquisition();
+
+    IReadOnlyCollection<IAcquisitionChoice> PreviousChoices { get; }
+
+    IReadOnlyCollection<IAcquisitionChoice> NextChoices { get; }
 }

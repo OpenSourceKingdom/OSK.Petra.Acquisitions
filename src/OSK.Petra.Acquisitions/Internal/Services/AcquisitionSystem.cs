@@ -1,5 +1,5 @@
-﻿using OSK.Petra.Acquisitions.Models;
-using OSK.Petra.Acquisitions.Options;
+﻿using OSK.Petra.Acquisitions.Internal.Models;
+using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Ports;
 using System;
 using System.Collections.Generic;
@@ -17,15 +17,20 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
 
     #region IAcquisitionSystem
 
-    public void Initialize(AcquisitionServiceOptions? options = null)
+    public void AddHub(IAcquisitionHub hub, AcquisitionHubState state)
     {
-        if (options?.AcquisitionStates is not null)
+        if (hub is null)
         {
-            foreach (var state in options.AcquisitionStates)
-            {
-                _hubManagers[state.OwnerId] = new(state.OwnerId, state, serviceProvider);
-            }
+            throw new ArgumentNullException(nameof(hub));
         }
+
+        if (!_hubManagers.TryGetValue(hub.OwnerId, out var manager))
+        {
+            manager = new AcquisitionOwnerHubManager(hub.OwnerId, new() { OwnerId = hub.OwnerId }, serviceProvider);
+            _hubManagers[hub.OwnerId] = manager;
+        }
+
+        manager.AddAcquisitionHub(hub, state);
     }
 
     public IEnumerable<OwnerAcquisitionState> GetStates()

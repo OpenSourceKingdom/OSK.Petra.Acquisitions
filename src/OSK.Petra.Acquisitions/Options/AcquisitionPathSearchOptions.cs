@@ -1,8 +1,6 @@
 ﻿using OSK.Petra.Acquisitions.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.Options;
 
@@ -18,17 +16,32 @@ public readonly struct AcquisitionPathSearchOptions
 
     #region Api
 
+    public AcquisitionPathSearchOptions AvailableEdges()
+        => Where(choice => choice.NextChoices is null || choice.NextChoices.Count is 0 || choice.NextChoices.All(next => !next.IsAvailable));
+
+    public AcquisitionPathSearchOptions IncludeComplete()
+        => Where(choice => choice.IsComplete);
+
+    public AcquisitionPathSearchOptions IncludeAvailable()
+        => Where(choice => choice.IsAvailable);
+
+    public AcquisitionPathSearchOptions IncludeUnavailable()
+        => Where(choice => choice.IsAvailable);
+
+    public AcquisitionPathSearchOptions IncludeIncomplete()
+        => Where(choice => choice.IsAvailable);
+
     public AcquisitionPathSearchOptions ExcludeComplete()
         => Where(choice => !choice.IsComplete);
 
     public AcquisitionPathSearchOptions ExcludeIncomplete()
-        => Where(choice => choice.IsComplete);
+        => Where(choice => !choice.IsComplete);
 
     public AcquisitionPathSearchOptions ExcludeAvailable()
         => Where(choice => !choice.IsAvailable);
 
     public AcquisitionPathSearchOptions ExcludeUnavailable()
-        => Where(choice => choice.IsAvailable);
+        => Where(choice => !choice.IsAvailable);
 
     public AcquisitionPathSearchOptions WithTiers(params int[] tiers)
         => new()

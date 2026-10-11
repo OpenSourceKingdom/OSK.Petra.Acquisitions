@@ -7,7 +7,7 @@ public class TimerHold : IAcquisitionHold
 {
     #region Variables
 
-    private TimeSpan _remainingTime;
+    private TimeSpan? _remainingTime;
 
     #endregion
 
@@ -17,7 +17,7 @@ public class TimerHold : IAcquisitionHold
 
     public TimeSpan RemainingTime 
     { 
-        get => _remainingTime;
+        get => _remainingTime ?? Timer;
         init => _remainingTime = value;
     }
 
@@ -26,18 +26,23 @@ public class TimerHold : IAcquisitionHold
     #region IAcquisitionHold
 
     public double GetPercentageComplete()
-        => _remainingTime.TotalMilliseconds / Timer.TotalMilliseconds;
+        => (Timer.TotalMilliseconds - (_remainingTime?.TotalMilliseconds ?? Timer.TotalMilliseconds)) / Timer.TotalMilliseconds;
 
     public AcquisitionHoldStatus Update(IServiceProvider serviceProvider, TimeSpan deltaTime)
     {
-        if (_remainingTime >= Timer)
+        if (_remainingTime is null)
+        {
+            _remainingTime = Timer;
+        }
+
+        if (RemainingTime <= TimeSpan.Zero)
         {
             return AcquisitionHoldStatus.Released;
         }
 
-        _remainingTime += deltaTime;
-        _remainingTime = _remainingTime >= Timer ? Timer : _remainingTime;
-        return _remainingTime >= Timer 
+        _remainingTime -= deltaTime;
+        _remainingTime = _remainingTime <= TimeSpan.Zero ? TimeSpan.Zero : _remainingTime;
+        return _remainingTime <= TimeSpan.Zero
             ? AcquisitionHoldStatus.Released 
             : AcquisitionHoldStatus.Active;
     }

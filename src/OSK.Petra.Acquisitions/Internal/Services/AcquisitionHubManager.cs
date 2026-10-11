@@ -1,4 +1,5 @@
-﻿using OSK.Petra.Acquisitions.Models;
+﻿using OSK.Petra.Acquisitions.Internal.Models;
+using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Ports;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,20 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
 
     public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
     {
+        AddAcquisitionHub(hub);
+
+        return _hubGroups[hub.Id].GetAcquisitionView(hub, acquirer);
+    }
+
+    public void AddAcquisitionHub(IAcquisitionHub hub, AcquisitionHubState? hubState = null)
+    {
         if (!_hubGroups.TryGetValue(hub.Id, out var group))
         {
             group = new(hub.GroupId, serviceProvider, ownerState);
             _hubGroups[hub.GroupId] = group;
         }
 
-        return group.GetAcquisitionView(hub, acquirer);
+        group.AddHub(hub, hubState);
     }
 
     public void Update(TimeSpan deltaTime)

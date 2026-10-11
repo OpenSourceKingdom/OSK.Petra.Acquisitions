@@ -17,7 +17,7 @@ public class AcquisitionChoiceConfiguration
     /// <summary>
     /// The collection of requirements that must be met to consider the <see cref="IAcquireable"/> as available
     /// </summary>
-    public IEnumerable<IAcquisitionRequirement> Requirements { get; } = [];
+    public IEnumerable<IAcquisitionRequirement> Requirements { get; init; } = [];
 
     /// <summary>
     /// The total amount of acquisitions an <see cref="IAcquirer"/> can make for the associated <see cref="IAcquireable"/>

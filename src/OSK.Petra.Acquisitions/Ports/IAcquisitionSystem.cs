@@ -1,8 +1,6 @@
 ﻿using OSK.Hexagonal.MetaData;
 using OSK.Petra.Acquisitions.Models;
-using OSK.Petra.Acquisitions.Options;
 using System;
-using System.Collections.Generic;
 
 namespace OSK.Petra.Acquisitions.Ports;
 
@@ -12,9 +10,7 @@ namespace OSK.Petra.Acquisitions.Ports;
 [HexagonalIntegration(HexagonalIntegrationType.LibraryProvided, HexagonalIntegrationType.ConsumerPointOfEntry)]
 public interface IAcquisitionSystem
 {
-    void Initialize(AcquisitionServiceOptions? options = null);
-
-    IEnumerable<OwnerAcquisitionState> GetStates();
+    void AddHub(IAcquisitionHub hub, AcquisitionHubState state);
 
     IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer);
 

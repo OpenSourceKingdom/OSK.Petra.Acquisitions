@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace OSK.Petra.Acquisitions.Models;
@@ -9,8 +8,6 @@ public class AcquisitionHubQueueState
     #region Variables
 
     public int TotalQueuedAcquisitions => PendingAcquisitions.Count + AcquisitionsInProgress.Count;
-
-    public Guid HubId { get; init; }
 
     public LinkedList<AcquisitionHoldState> PendingAcquisitions { get; init; } = [];
 
