@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace OSK.Petra.Acquisitions.Internal.Services;
 
-internal class AcquisitionView(IAcquisitionHub hub, IAcquirer acquirer, IEnumerable<Acquisition> acquisitions) : IAcquirerAcquisitionView
+internal class AcquisitionView(IAcquisitionHub hub, IAcquirer acquirer, IReadOnlyCollection<Acquisition> acquisitions) : IAcquisitionView
 {
-    #region IAcquirerAcquisitionView
+    #region IAcquisitionView
 
     public IAcquisitionHub Hub => hub;
 
     public IAcquirer Acquirer => acquirer;
 
-    public IEnumerable<IAcquisition> Acquisitions => acquisitions;
+    public IReadOnlyCollection<IAcquisition> Acquisitions => acquisitions;
 
     public void Update(IEnumerable<Provision> provisions)
     {

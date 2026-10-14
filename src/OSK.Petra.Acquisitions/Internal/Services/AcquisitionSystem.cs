@@ -36,7 +36,7 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
     public IEnumerable<OwnerAcquisitionState> GetStates()
         => _hubManagers.Values.Select(manager => manager.OwnerState);
 
-    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    public IAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
     {
         if (hub is null)
         {

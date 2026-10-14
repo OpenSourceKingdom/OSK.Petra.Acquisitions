@@ -22,7 +22,7 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
 
     public int TotalGroups => _hubGroups.Count;
 
-    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    public IAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
     {
         AddAcquisitionHub(hub);
 

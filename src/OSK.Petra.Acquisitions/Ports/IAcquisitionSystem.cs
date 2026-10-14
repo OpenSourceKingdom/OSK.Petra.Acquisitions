@@ -30,7 +30,7 @@ public interface IAcquisitionSystem
     /// <item>The acquirer may impact the availability, provision, and other requirements for a given view</item>
     /// </list>
     /// </remarks>
-    IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer);
+    IAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer);
 
     /// <summary>
     /// Removes the hub and its related queue state from the system

@@ -86,12 +86,12 @@ internal class AcquisitionHubGroup
         }
     }
 
-    public IAcquirerAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
+    public IAcquisitionView GetAcquisitionView(IAcquisitionHub hub, IAcquirer acquirer)
     {
         AddHub(hub);
 
-        return new AcquisitionView(hub, acquirer, _acquisitionInformationStatePairs.Select(kvp 
-            => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState, isPathView: false)));
+        return new AcquisitionView(hub, acquirer, 
+            [.. _acquisitionInformationStatePairs.Select(kvp => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState, isPathView: false))]);
     }
 
     public AcquisitionResult InitiateAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable selectedAcquireable, IEnumerable<Provision> provisions)

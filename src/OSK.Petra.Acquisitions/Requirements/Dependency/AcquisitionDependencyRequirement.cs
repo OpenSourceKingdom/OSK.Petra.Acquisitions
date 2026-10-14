@@ -21,6 +21,7 @@ public class AcquisitionDependencyRequirement(IEnumerable<AcquisitionDependency>
         }
 
         var met = dependencies
+                    // Dependency can not require itself
                     .Where(dependency => dependency.AcquireableId != context.Acquireable.Id)
                     .All(dependency => context.TryGetChoiceProgression(dependency.AcquisitionPathId, dependency.AcquireableId, out var choiceTierProgression) && choiceTierProgression.Value.TotalAcquisitions >= dependency.RequiredAcquisitionCount);
         return met;
