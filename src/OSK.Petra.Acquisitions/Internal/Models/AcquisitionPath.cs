@@ -27,7 +27,7 @@ internal class AcquisitionPath(AcquisitionHubGroup hubGroup, IAcquisitionHub hub
             ? information.Choices.Values.Where(v => searchOptions.Value.TierFilter.Contains(v.Tier)).Select(v => v.Definition)
             : information.Choices.Values.Select(v => v.Definition);
 
-        var acquisitionChoices = searchableChoices.Select(choice => SharedAcquisitionPool.GetAcquisition(hubGroup, hub, acquirer, information, choice, state)).Cast<IAcquisitionChoice>();
+        var acquisitionChoices = searchableChoices.Select(choice => SharedAcquisitionPool.GetAcquisition(hubGroup, hub, acquirer, information, choice, state, isPathView: true)).Cast<IAcquisitionChoice>();
         return searchOptions is { PredicateFilters.Length: >= 1 }
             ? acquisitionChoices.Where(choice => searchOptions.Value.PredicateFilters.All(predicate => predicate(choice)))
             : acquisitionChoices;

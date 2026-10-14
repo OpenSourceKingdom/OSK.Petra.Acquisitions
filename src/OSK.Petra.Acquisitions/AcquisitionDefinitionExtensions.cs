@@ -6,7 +6,12 @@ namespace OSK.Petra.Acquisitions;
 
 public static class AcquisitionDefinitionExtensions
 {
-    public static IEnumerable<IAcquisitionDefinition> Flatten(this IAcquisitionDefinition definition)
+    /// <summary>
+    /// Expands the choice definition to get all the choices within the definition tree
+    /// </summary>
+    /// <param name="definition">The definition to expand</param>
+    /// <returns>The collection of all choices on the definition</returns>
+    public static IEnumerable<IAcquisitionDefinition> ExpandChoices(this IAcquisitionDefinition definition)
         => Flatten(definition, []);
 
     private static IEnumerable<IAcquisitionDefinition> Flatten(IAcquisitionDefinition choice, HashSet<Guid> visited)
@@ -28,31 +33,4 @@ public static class AcquisitionDefinitionExtensions
             }
         }
     }
-    /*
-    extension(IAcquisitionDefinition choice)
-    {
-        public IEnumerable<IAcquisitionDefinition> Flatten()
-            => Flatten(choice, []);
-
-        private IEnumerable<IAcquisitionDefinition> Flatten(HashSet<Guid> visited)
-        {
-            if (visited.Contains(choice.Acquireable.Id))
-            {
-                yield break;
-            }
-
-            visited.Add(choice.Acquireable.Id);
-            
-            yield return choice;
-            
-            foreach (var nextChoice in choice.NextChoices)
-            {
-                foreach (var nestedChoice in nextChoice.Flatten(visited))
-                {
-                    yield return nestedChoice;
-                }
-            }
-        }
-    }
-    */
 }

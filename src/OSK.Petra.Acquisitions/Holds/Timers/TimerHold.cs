@@ -3,6 +3,9 @@ using System;
 
 namespace OSK.Petra.Acquisitions.Holds.Timers;
 
+/// <summary>
+/// Represents a hold that utilizes a time span to prevent an acquisition process
+/// </summary>
 public class TimerHold : IAcquisitionHold
 {
     #region Variables
@@ -13,8 +16,14 @@ public class TimerHold : IAcquisitionHold
 
     #region Api
 
+    /// <summary>
+    /// The total time for the timer
+    /// </summary>
     public TimeSpan Timer { get; init; }
 
+    /// <summary>
+    /// The remaining time before the timer ends
+    /// </summary>
     public TimeSpan RemainingTime 
     { 
         get => _remainingTime ?? Timer;

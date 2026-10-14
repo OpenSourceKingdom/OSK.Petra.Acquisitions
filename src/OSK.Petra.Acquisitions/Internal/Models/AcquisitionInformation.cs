@@ -1,6 +1,4 @@
-﻿using OSK.Petra.Acquisitions.Internal.Services;
-using OSK.Petra.Acquisitions.Models;
-using OSK.Petra.Acquisitions.Ports;
+﻿using OSK.Petra.Acquisitions.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -30,7 +28,7 @@ internal class AcquisitionInformation
         PathType = pathType;
         Choices = choices?.ToDictionary(choiceTuple => choiceTuple.Definition.Acquireable.Id) ?? throw new ArgumentNullException(nameof(choices));
 
-        MaxTier = Choices.Values.Max(choiceTuple => choiceTuple.Tier);
+        MaxTier = Choices.Values.Max(choiceTuple => choiceTuple.Tier) + 1;
     }
 
     #endregion

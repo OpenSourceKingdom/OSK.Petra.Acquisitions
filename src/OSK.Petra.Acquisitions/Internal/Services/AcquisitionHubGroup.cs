@@ -62,7 +62,7 @@ internal class AcquisitionHubGroup
         {
             foreach (var acquisition in hub.GetAcquisitions())
             {
-                _acquisitionInformationStatePairs[acquisition.Acquireable.Id] = (SharedAcquisitionPool.GetInformation(acquisition), AcquisitionState.GetOrAddChoiceState(acquisition.Acquireable.Id));
+                _acquisitionInformationStatePairs[acquisition.Acquireable.Id] = (SharedAcquisitionPool.GetInformation(acquisition), AcquisitionState.GetOrAddPathState(acquisition.Acquireable.Id));
             }
 
             _initialized = true;
@@ -90,7 +90,8 @@ internal class AcquisitionHubGroup
     {
         AddHub(hub);
 
-        return new AcquisitionView(hub, acquirer, _acquisitionInformationStatePairs.Select(kvp => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState)));
+        return new AcquisitionView(hub, acquirer, _acquisitionInformationStatePairs.Select(kvp 
+            => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState, isPathView: false)));
     }
 
     public AcquisitionResult InitiateAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable selectedAcquireable, IEnumerable<Provision> provisions)
@@ -152,7 +153,7 @@ internal class AcquisitionHubGroup
         hubQueue.AddPendingAcquisition(new AcquisitionHoldState
         {
             Acquirer = acquirer,
-            RequiredProvisions = requiredProvisions,
+            ReservedProvisions = requiredProvisions,
             Hold = acquisitionHold
         }, isQueued: isQueued);
 
@@ -190,7 +191,7 @@ internal class AcquisitionHubGroup
 
         return removedHold is null
             ? new ([])
-            : new (removedHold.RequiredProvisions);
+            : new (removedHold.ReservedProvisions);
 
     }
 

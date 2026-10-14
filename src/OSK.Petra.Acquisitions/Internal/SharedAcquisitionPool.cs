@@ -42,18 +42,19 @@ internal static class SharedAcquisitionPool
         return information;
     }
 
-    public static Acquisition GetAcquisition(AcquisitionHubGroup group, IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choiceDefinition, AcquisitionPathState pathState)
+    public static Acquisition GetAcquisition(AcquisitionHubGroup group, IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choiceDefinition, AcquisitionPathState pathState,
+        bool isPathView)
     {
         var tier = acquisitionInformation.Choices[choiceDefinition.Acquireable.Id].Tier;
 
         if (acquisitionInformation.RootDefinition.Acquireable.Id == choiceDefinition.Acquireable.Id)
         {
-            return choiceDefinition.NextChoices is null || choiceDefinition.NextChoices.Count is 0
-                ? new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, tier, pathState.ChoiceStates[choiceDefinition.Acquireable.Id])
+            return choiceDefinition.NextChoices is null || choiceDefinition.NextChoices.Count is 0 || isPathView
+                ? new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, tier, pathState.GetOrCreateState(choiceDefinition.Acquireable.Id))
                 : new AcquisitionPath(group, hub, acquirer, acquisitionInformation, pathState);
         }
 
-        return new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, 0, pathState.ChoiceStates[choiceDefinition.Acquireable.Id]);
+        return new AcquisitionChoice(group, hub, acquirer, acquisitionInformation.RootDefinition, choiceDefinition, 0, pathState.GetOrCreateState(choiceDefinition.Acquireable.Id));
     }
 
     #endregion

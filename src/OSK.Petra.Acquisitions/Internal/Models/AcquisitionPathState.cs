@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OSK.Petra.Acquisitions.Internal.Models;
 
@@ -18,6 +19,25 @@ internal class AcquisitionPathState
     #endregion
 
     #region Api
+
+    public AcquisitionChoiceState GetOrCreateState(Guid choiceId)
+    {
+        if (ChoiceStates.TryGetValue(choiceId, out var state))
+        {
+            return state;
+        }
+
+        state = new()
+        {
+            AcquireableId = choiceId
+        };
+
+        ChoiceStates[choiceId] = state;
+        return state;
+    }
+
+    public bool TryGetChoiceState(Guid pathAcquireableId, [NotNullWhen(true)] out AcquisitionChoiceState? choiceState)
+        => ChoiceStates.TryGetValue(pathAcquireableId, out choiceState);
 
     public AcquisitionChoiceState RootChoice()
         => ChoiceStates[RootChoiceId];

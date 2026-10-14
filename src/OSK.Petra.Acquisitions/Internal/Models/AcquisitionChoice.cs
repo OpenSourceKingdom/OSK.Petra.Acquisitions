@@ -33,7 +33,7 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
             ? queue.AcquisitionsInProgress.Select(holdState => new AcquisitionProgress(holdState.Hold.GetPercentageComplete()))
             : [];
 
-    public bool IsAvailable { get; private set; } = AreRequirementsMet(choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
+    public bool IsAvailable { get; private set; } = IsChoiceAvailable(pathAcquisition, choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
 
     public ProvisionExpenditureSummary NextExpenditure { get; private set; } = GetExpenditureSummary(hubGroup, hub, acquirer, pathAcquisition, choiceDefinition, []);
 
@@ -51,7 +51,7 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
     {
         IsAvailable = IsAvailable
             ? true
-            : AreRequirementsMet(choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
+            : IsChoiceAvailable(pathAcquisition, choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
 
         NextExpenditure = GetExpenditureSummary(hubGroup, hub, acquirer, pathAcquisition, choiceDefinition, provisions);
     }
@@ -68,12 +68,16 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
         return ProvisionCalculator.CalculateExpenditure(requiredProvisions, provisions);
     }
 
-    private static bool AreRequirementsMet(IAcquisitionDefinition choiceDefinition, IAcquirer acquirer, OwnerAcquisitionState acquisitionState, IServiceProvider serviceProvider)
+    private static bool IsChoiceAvailable(IAcquisitionDefinition pathAcquisition, IAcquisitionDefinition choiceDefinition, IAcquirer acquirer, OwnerAcquisitionState acquisitionState, IServiceProvider serviceProvider)
     {
-        var context = new AcquisitionRequirementContext(acquirer, acquisitionState, serviceProvider);
+        var context = new AcquisitionRequirementContext(acquirer, choiceDefinition.Acquireable, acquisitionState, serviceProvider);
 
-        return choiceDefinition.Configuration.Requirements.All(requirement => requirement.IsMet(context));
+        return IsWithinLimit(pathAcquisition, choiceDefinition, acquisitionState) && choiceDefinition.Configuration.Requirements.All(requirement => requirement.IsMet(context));
     }
+
+    private static bool IsWithinLimit(IAcquisitionDefinition pathAcquisition, IAcquisitionDefinition choiceDefinition, OwnerAcquisitionState acquisitionState)
+        => !choiceDefinition.Configuration.MaxAcquisitionCount.HasValue || !acquisitionState.TryGetPathState(pathAcquisition.Acquireable.Id, out var pathState) || !pathState.TryGetChoiceState(choiceDefinition.Acquireable.Id, out var choiceState)
+            || choiceDefinition.Configuration.MaxAcquisitionCount > choiceState.TotalAcquisitions;
 
     #endregion
 }

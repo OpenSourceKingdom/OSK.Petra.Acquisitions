@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OSK.Petra.Acquisitions.Internal.Models;
 
@@ -9,25 +10,28 @@ internal class OwnerAcquisitionState
 
     public required int OwnerId { get; init; }
 
-    public Dictionary<Guid, AcquisitionPathState> AcquisitionPaths { get; } = [];
+    public Dictionary<Guid, AcquisitionPathState> AcquisitionPathStates { get; } = [];
 
     #endregion
 
     #region Api
 
-    public AcquisitionPathState GetOrAddChoiceState(Guid acquireableId)
+    public AcquisitionPathState GetOrAddPathState(Guid acquireableId)
     {
-        if (!AcquisitionPaths.TryGetValue(acquireableId, out var pathState))
+        if (!AcquisitionPathStates.TryGetValue(acquireableId, out var pathState))
         {
             pathState = new AcquisitionPathState
             {
                 RootChoiceId = acquireableId
             };
-            AcquisitionPaths[acquireableId] = pathState;
+            AcquisitionPathStates[acquireableId] = pathState;
         }
 
         return pathState;
     }
+
+    public bool TryGetPathState(Guid pathAcquireableId, [NotNullWhen(true)] out AcquisitionPathState? pathState)
+        => AcquisitionPathStates.TryGetValue(pathAcquireableId, out pathState);
 
     #endregion
 }

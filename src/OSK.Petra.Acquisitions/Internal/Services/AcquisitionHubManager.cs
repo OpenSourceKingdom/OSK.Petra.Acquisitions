@@ -26,7 +26,7 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
     {
         AddAcquisitionHub(hub);
 
-        return _hubGroups[hub.Id].GetAcquisitionView(hub, acquirer);
+        return _hubGroups[hub.GroupId].GetAcquisitionView(hub, acquirer);
     }
 
     public void AddAcquisitionHub(IAcquisitionHub hub, AcquisitionHubState? hubState = null)

@@ -2,14 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.Models;
 
+/// <summary>
+/// Describes the result of a cancellation of an acquisition
+/// </summary>
 public class AcquisitionCancellationResult
 {
     #region Variables
 
+    /// <summary>
+    /// The collection of provisions that are freed by the cancellation of the acquisition
+    /// </summary>
     public IReadOnlyCollection<Provision> FreedProvisions { get; }
 
     #endregion
