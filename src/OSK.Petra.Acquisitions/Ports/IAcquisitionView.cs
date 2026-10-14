@@ -31,4 +31,15 @@ public interface IAcquisitionView
     /// </summary>
     /// <param name="provisions">The currently available provisions for choices within the view</param>
     void Update(IEnumerable<Provision> provisions);
+
+    /// <summary>
+    /// Updates the internal availability related information for potential changes.
+    /// </summary>
+    /// <remarks>
+    /// 💡Notes:
+    /// <list type="bullet">
+    /// <item>This will utilize the previous provisions as the provision value</item>
+    /// </list>
+    /// </remarks>
+    void Refresh();
 }
