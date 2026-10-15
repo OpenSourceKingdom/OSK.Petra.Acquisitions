@@ -1,5 +1,6 @@
 ﻿using OSK.Petra.Acquisitions.Internal.Models;
 using OSK.Petra.Acquisitions.Models;
+using OSK.Petra.Acquisitions.Options;
 using OSK.Petra.Acquisitions.Ports;
 using OSK.Petra.Provisions;
 using OSK.Petra.Provisions.Models;
@@ -94,7 +95,7 @@ internal class AcquisitionHubGroup
             [.. _acquisitionInformationStatePairs.Select(kvp => SharedAcquisitionPool.GetAcquisition(this, hub, acquirer, kvp.Value.AcquisitionInformation, kvp.Value.AcquisitionInformation.Choices[kvp.Key].Item2, kvp.Value.PathState, isPathView: false))]);
     }
 
-    public AcquisitionResult InitiateAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable selectedAcquireable, IEnumerable<Provision> provisions)
+    public AcquisitionResult InitiateAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable selectedAcquireable, IEnumerable<Provision> provisions, AcquisitionOptions? options = null)
     {
         if (acquirer is null)
         {
@@ -137,7 +138,8 @@ internal class AcquisitionHubGroup
         var requiredProvisions = choiceDefinition.Configuration.AcquisitionCostProvider?.GetCost(acquisitionContext) ?? [];
 
         var provisionExpenditureSummmary = ProvisionCalculator.CalculateExpenditure(requiredProvisions, provisions);
-        if (!provisionExpenditureSummmary.Sufficient)
+        var allowInsufficientProvisions = options?.AllowInsufficientProvisions ?? false;
+        if (!allowInsufficientProvisions && !provisionExpenditureSummmary.Sufficient)
         {
             return AcquisitionResult.InsufficientProvisions(provisionExpenditureSummmary);
         }
@@ -263,7 +265,7 @@ internal class AcquisitionHubGroup
             {
                 return true;
             }
-            if (choiceConfiguration.MaxConcurrentAcquisitions.HasValue && queue.AcquisitionsInProgress.Count >= choiceConfiguration.MaxConcurrentAcquisitions.Value)
+            if (choiceConfiguration.MaxGroupConcurrentAcquisitions.HasValue && queue.AcquisitionsInProgress.Count >= choiceConfiguration.MaxGroupConcurrentAcquisitions.Value)
             {
                 return true;
             }
@@ -278,14 +280,14 @@ internal class AcquisitionHubGroup
     {
         if (choiceState.HubQueues.TryGetValue(hub.Id, out var queue))
         {
-            if (choiceConfiguration.MaxQueueSize.HasValue && queue.PendingAcquisitions.Count >= choiceConfiguration.MaxQueueSize.Value)
+            if (hub.Configuration.MaxPendingAcquisitions.HasValue && queue.PendingAcquisitions.Count >= hub.Configuration.MaxPendingAcquisitions.Value)
             {
                 return true;
             }
         }
 
-        return choiceConfiguration.MaxGroupQueueSize.HasValue
-            ? choiceState.HubQueues.Sum(queue => queue.Value.PendingAcquisitions.Count) >= choiceConfiguration.MaxGroupQueueSize.Value
+        return choiceConfiguration.MaxGroupPendingAcquisitions.HasValue
+            ? choiceState.HubQueues.Sum(queue => queue.Value.PendingAcquisitions.Count) >= choiceConfiguration.MaxGroupPendingAcquisitions.Value
             : false;
     }
 

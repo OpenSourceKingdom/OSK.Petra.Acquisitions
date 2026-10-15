@@ -1,4 +1,5 @@
-﻿using OSK.Petra.Acquisitions.Ports;
+﻿using OSK.Petra.Acquisitions.Options;
+using OSK.Petra.Acquisitions.Ports;
 using OSK.Petra.Provisions.Models;
 using System.Collections.Generic;
 
@@ -54,8 +55,9 @@ public interface IAcquisitionChoice: IAcquisition
     /// Initiates the acquisition process using the provided provisions
     /// </summary>
     /// <param name="provisions">The provisions available for the acquisition process to use</param>
+    /// <param name="options">Extra options related to the acquisition</param>
     /// <returns>The result of the acquisition process</returns>
-    AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions);
+    AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions, AcquisitionOptions? options = null);
 
     /// <summary>
     /// Cancels an acquisition that is either queued or in progress

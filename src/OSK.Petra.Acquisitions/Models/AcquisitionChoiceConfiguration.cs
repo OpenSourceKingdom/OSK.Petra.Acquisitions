@@ -31,17 +31,6 @@ public class AcquisitionChoiceConfiguration
     public int? MaxAcquisitionCount { get; init; }
 
     /// <summary>
-    /// The total number of acquisitions that can be acquired across an individual <see cref="IAcquisitionHub"/>
-    /// </summary>
-    /// <remarks>
-    /// 💡Notes:
-    /// <list type="bullet">
-    /// <item>A null count represents an endless amount of concurrent acquisition processes</item>
-    /// </list>
-    /// </remarks>
-    public int? MaxConcurrentAcquisitions { get; init; }
-
-    /// <summary>
     /// The total number of acquisitions that can be acquired across a particular <see cref="IAcquisitionHub.GroupId"/>
     /// </summary>
     /// <remarks>
@@ -50,18 +39,7 @@ public class AcquisitionChoiceConfiguration
     /// <item>A null count represents an endless amount of concurrent acquisition processes across the group</item>
     /// </list>
     /// </remarks>
-    public int? MaxGroupConcurrentAcquisitions { get; init; }
-
-    /// <summary>
-    /// The total queue size for a backlog of acquisitions across a particular <see cref="IAcquisitionHub"/>
-    /// </summary>
-    /// <remarks>
-    /// 💡Notes:
-    /// <list type="bullet">
-    /// <item>A null count represents an endless queue size</item>
-    /// </list>
-    /// </remarks>
-    public int? MaxQueueSize { get; init; }
+    public int? MaxGroupConcurrentAcquisitions { get; init; }   
 
     /// <summary>
     /// The total queue size for a backlog of acquisitions across a particular <see cref="IAcquisitionHub.GroupId"/>
@@ -72,7 +50,7 @@ public class AcquisitionChoiceConfiguration
     /// <item>A null count represents an endless queue size across the group</item>
     /// </list>
     /// </remarks>
-    public int? MaxGroupQueueSize { get; init; }
+    public int? MaxGroupPendingAcquisitions { get; init; }
 
     /// <summary>
     /// A provider that sets the hold for a current acquisition process (e.g. a timer hold to wait x seconds prior to acquiring')

@@ -1,5 +1,6 @@
 ﻿using OSK.Petra.Acquisitions.Internal.Services;
 using OSK.Petra.Acquisitions.Models;
+using OSK.Petra.Acquisitions.Options;
 using OSK.Petra.Acquisitions.Ports;
 using OSK.Petra.Provisions;
 using OSK.Petra.Provisions.Models;
@@ -22,8 +23,8 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
 
     public int TotalInProgress => choiceState.GetTotalAcquisitionsInProgress(hub.Id);
 
-    public AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions)
-        => hubGroup.InitiateAcquisition(hub, acquirer, pathAcquisition.Acquireable, choiceDefinition.Acquireable, provisions);
+    public AcquisitionResult InitiateAcquisition(IEnumerable<Provision> provisions, AcquisitionOptions? options = null)
+        => hubGroup.InitiateAcquisition(hub, acquirer, pathAcquisition.Acquireable, choiceDefinition.Acquireable, provisions, options);
 
     public AcquisitionCancellationResult CancelAcquisition()
         => hubGroup.CancelAcquisition(hub, acquirer, pathAcquisition.Acquireable, choiceDefinition.Acquireable);
