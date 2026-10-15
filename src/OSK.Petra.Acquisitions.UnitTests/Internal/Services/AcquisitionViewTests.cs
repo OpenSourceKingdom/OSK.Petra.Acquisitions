@@ -4,9 +4,6 @@ using OSK.Petra.Acquisitions.Internal.Services;
 using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Ports;
 using OSK.Petra.Provisions.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.UnitTests.Internal.Services;
 

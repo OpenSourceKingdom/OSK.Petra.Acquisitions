@@ -23,6 +23,10 @@ internal class AcquisitionSystem(IServiceProvider serviceProvider) : IAcquisitio
         {
             throw new ArgumentNullException(nameof(hub));
         }
+        if (state is null)
+        {
+            throw new ArgumentNullException(nameof(state));
+        }
 
         if (!_hubManagers.TryGetValue(hub.OwnerId, out var manager))
         {

@@ -31,7 +31,7 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
 
     public void AddAcquisitionHub(IAcquisitionHub hub, AcquisitionHubState? hubState = null)
     {
-        if (!_hubGroups.TryGetValue(hub.Id, out var group))
+        if (!_hubGroups.TryGetValue(hub.GroupId, out var group))
         {
             group = new(hub.GroupId, serviceProvider, ownerState);
             _hubGroups[hub.GroupId] = group;
@@ -50,7 +50,7 @@ internal class AcquisitionOwnerHubManager(int ownerId, OwnerAcquisitionState own
 
     public bool RemoveHub(IAcquisitionHub hub)
     {
-        if (!_hubGroups.TryGetValue(hub.Id, out var group))
+       if (!_hubGroups.TryGetValue(hub.GroupId, out var group))
         {
             return false;
         }

@@ -1,9 +1,6 @@
 ﻿using Moq;
 using OSK.Petra.Acquisitions.Holds.Timers;
 using OSK.Petra.Acquisitions.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.UnitTests.Holds.Timers;
 

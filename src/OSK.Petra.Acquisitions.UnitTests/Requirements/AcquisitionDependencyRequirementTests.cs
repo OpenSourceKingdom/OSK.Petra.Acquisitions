@@ -2,9 +2,6 @@
 using OSK.Petra.Acquisitions.Internal.Models;
 using OSK.Petra.Acquisitions.Models;
 using OSK.Petra.Acquisitions.Requirements.Dependency;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OSK.Petra.Acquisitions.UnitTests.Requirements;
 

@@ -85,6 +85,11 @@ internal static class SharedAcquisitionPool
 
         choiceTierLookup[acquisition] = tier;
 
+        if (acquisition.NextChoices is null)
+        {
+            return;
+        }
+
         foreach (var child in acquisition.NextChoices)
         {
             DiscoverChoiceTier(child, tier + 1, choiceTierLookup);

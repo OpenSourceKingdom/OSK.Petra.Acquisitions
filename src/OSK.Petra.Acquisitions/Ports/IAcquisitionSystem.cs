@@ -11,10 +11,13 @@ namespace OSK.Petra.Acquisitions.Ports;
 public interface IAcquisitionSystem
 {
     /// <summary>
-    /// Adds a hub and its state to the acquisition system
+    /// Adds a hub and its state to the acquisition system.
     /// </summary>
     /// <param name="hub">The hub to add to the system</param>
     /// <param name="state">The related state that should be associated with the hub</param>
+    /// <list type="bullet">
+    /// <item>Calling this endpoint is only necessary if setting a state with the hub is needed. <see cref="GetAcquisitionView(IAcquisitionHub, IAcquirer)"/> is meant to work with any <see cref="IAcquisitionHub"/> even if it's not been added prior</item>
+    /// </list>
     void AddHub(IAcquisitionHub hub, AcquisitionHubState state);
 
     /// <summary>
