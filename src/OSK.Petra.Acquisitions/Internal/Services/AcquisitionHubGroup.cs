@@ -137,18 +137,18 @@ internal class AcquisitionHubGroup
         var acquisitionContext = GetHubAcquisitionContext(hub, acquirer, informationStatePair.AcquisitionInformation.RootDefinition, choiceDefinition);
         var requiredProvisions = choiceDefinition.Configuration.AcquisitionCostProvider?.GetCost(acquisitionContext) ?? [];
 
-        var provisionExpenditureSummmary = ProvisionCalculator.CalculateExpenditure(requiredProvisions, provisions);
+        var provisionExpenditureSummary = ProvisionCalculator.CalculateExpenditure(requiredProvisions, provisions);
         var allowInsufficientProvisions = options?.AllowInsufficientProvisions ?? false;
-        if (!allowInsufficientProvisions && !provisionExpenditureSummmary.Sufficient)
+        if (!allowInsufficientProvisions && !provisionExpenditureSummary.Sufficient)
         {
-            return AcquisitionResult.InsufficientProvisions(provisionExpenditureSummmary);
+            return AcquisitionResult.InsufficientProvisions(provisionExpenditureSummary);
         }
 
         var acquisitionHold = choiceDefinition.Configuration.AcquisitionHoldProvider?.GetHold(acquisitionContext);
         if (acquisitionHold is null)
         {
             CompleteAcquisition(hub, acquirer, informationStatePair.AcquisitionInformation, choiceDefinition, choiceState, AcquisitionHoldStatus.Released);
-            return AcquisitionResult.Acquired(choiceDefinition.Acquireable, provisionExpenditureSummmary);
+            return AcquisitionResult.Acquired(choiceDefinition.Acquireable, provisionExpenditureSummary);
         }
 
         var hubQueue = choiceState.GetOrAddHubQueue(hub.Id);
@@ -159,7 +159,7 @@ internal class AcquisitionHubGroup
             Hold = acquisitionHold
         }, isQueued: isQueued);
 
-        return AcquisitionResult.Delayed(provisionExpenditureSummmary);
+        return AcquisitionResult.Delayed(provisionExpenditureSummary);
     }
 
     public AcquisitionCancellationResult CancelAcquisition(IAcquisitionHub hub, IAcquirer acquirer, IAcquireable pathAcquireable, IAcquireable canceledAcquireable)

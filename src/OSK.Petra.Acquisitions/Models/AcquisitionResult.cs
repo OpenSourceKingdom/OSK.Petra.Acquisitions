@@ -34,7 +34,7 @@ public class AcquisitionResult
 
     /// <summary>
     /// Creates an acquisition result that failed because the max queue size was reached
-    /// </summary>>
+    /// </summary>
     /// <returns>The result</returns>
     public static AcquisitionResult MaxQueueSizeReached() => new(AcquisitionOutcome.MaxQueueSizeReached);
 
