@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="OSK.Petra.Acquisitions.UnitTests/OSK.Petra.Acquisitions.UnitTests.csproj" Id="0d21ea25-a150-4e08-8818-c6460f2ec196" />
+  <Project Path="OSK.Petra.Acquisitions/OSK.Petra.Acquisitions.csproj" />
+</Solution>
