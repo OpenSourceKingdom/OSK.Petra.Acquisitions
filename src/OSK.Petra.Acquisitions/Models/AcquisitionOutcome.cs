@@ -24,7 +24,7 @@ public enum AcquisitionOutcome
     /// </summary>
     MaxQueueSizeReached,
     /// <summary>
-    /// The maximum number of acuisitions for the acquireable has been reached
+    /// The maximum number of acquisitions for the acquireable has been reached
     /// </summary>
     MaxAcquisitionsReached
 }

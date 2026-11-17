@@ -53,7 +53,7 @@ public class AcquisitionChoiceConfiguration
     public int? MaxGroupPendingAcquisitions { get; init; }
 
     /// <summary>
-    /// A provider that sets the hold for a current acquisition process (e.g. a timer hold to wait x seconds prior to acquiring')
+    /// A provider that sets the hold for a current acquisition process (e.g. a timer hold to wait x seconds prior to acquiring)
     /// </summary>
     public IAcquisitionHoldProvider? AcquisitionHoldProvider { get; init; }
 

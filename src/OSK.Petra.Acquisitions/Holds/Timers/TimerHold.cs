@@ -35,7 +35,9 @@ public class TimerHold : IAcquisitionHold
     #region IAcquisitionHold
 
     public double GetPercentageComplete()
-        => (Timer.TotalMilliseconds - (_remainingTime?.TotalMilliseconds ?? Timer.TotalMilliseconds)) / Timer.TotalMilliseconds;
+        => Timer > TimeSpan.Zero
+            ? (Timer.TotalMilliseconds - (_remainingTime?.TotalMilliseconds ?? Timer.TotalMilliseconds)) / Timer.TotalMilliseconds
+            : 1;
 
     public AcquisitionHoldStatus Update(IServiceProvider serviceProvider, TimeSpan deltaTime)
     {

@@ -76,10 +76,8 @@ internal class AcquisitionHubGroup
                 {
                     continue;
                 }
-                if (!pathInformationPair.PathState.ChoiceStates.TryGetValue(choiceStateKvp.Value.AcquireableId, out var choiceState))
-                {
-                    continue;
-                }
+
+                var choiceState = pathInformationPair.PathState.GetOrCreateState(choiceStateKvp.Value.AcquireableId);
 
                 choiceState.TotalAcquisitions += choiceStateKvp.Value.TotalAcquisitions;
                 choiceState.HubQueues[hub.Id] = choiceStateKvp.Value.QueueState;
@@ -147,7 +145,7 @@ internal class AcquisitionHubGroup
         var acquisitionHold = choiceDefinition.Configuration.AcquisitionHoldProvider?.GetHold(acquisitionContext);
         if (acquisitionHold is null)
         {
-            CompleteAcquisition(hub, acquirer, informationStatePair.AcquisitionInformation, choiceDefinition, choiceState, AcquisitionHoldStatus.Released);
+            CompleteAcquisition(hub, acquirer, informationStatePair.AcquisitionInformation, choiceDefinition, choiceState, AcquisitionHoldStatus.Released, requiredProvisions);
             return AcquisitionResult.Acquired(choiceDefinition.Acquireable, provisionExpenditureSummary);
         }
 
@@ -178,23 +176,33 @@ internal class AcquisitionHubGroup
         }
 
         var informationStatePair = _acquisitionInformationStatePairs[pathAcquireable.Id];
-        var choiceState = informationStatePair.PathState.ChoiceStates[canceledAcquireable.Id];
-
-        if (!choiceState.TryGetHubQueue(hub.Id, out var hubQueue))
+        var cancelledChoiceDefinition = informationStatePair.AcquisitionInformation.GetChoiceDefinition(canceledAcquireable.Id);
+        if (cancelledChoiceDefinition is null)
         {
-            return new([]);
+            return new(false, []);
+        }
+
+        var cancelledChoiceState = informationStatePair.PathState.ChoiceStates[canceledAcquireable.Id];
+
+        if (!cancelledChoiceState.TryGetHubQueue(hub.Id, out var hubQueue))
+        {
+            return new(false, []);
         }
 
         var removedHold = hubQueue.RemoveAcquisition(acquirer);
-        if (hubQueue.TotalQueuedAcquisitions is 0)
+        if (removedHold is null)
         {
-            choiceState.RemoveHubQueue(hub.Id);
+            return new(false, []);
         }
 
-        return removedHold is null
-            ? new ([])
-            : new (removedHold.ReservedProvisions);
+        if (hubQueue.TotalQueuedAcquisitions is 0)
+        {
+            cancelledChoiceState.RemoveHubQueue(hub.Id);
+        }
 
+        CompleteAcquisition(hub, acquirer, informationStatePair.AcquisitionInformation, cancelledChoiceDefinition, cancelledChoiceState, AcquisitionHoldStatus.Blocked, removedHold.ReservedProvisions);
+
+        return new(true, removedHold.ReservedProvisions);
     }
 
     public bool RemoveHub(IAcquisitionHub hub)
@@ -208,6 +216,8 @@ internal class AcquisitionHubGroup
         {
             choiceState.RemoveHubQueue(hub.Id);
         }
+
+        SharedAcquisitionPool.Evict(this, hub.Id);
 
         return true;
     }
@@ -232,14 +242,14 @@ internal class AcquisitionHubGroup
                     hubQueue.StartNextAcquisition();
                 }
 
-                for (var index = hubQueue.AcquisitionsInProgress.Count; index > 0; index--)
+                for (var index = hubQueue.AcquisitionsInProgress.Count - 1; index >= 0; index--)
                 {
                     var acquisitionHoldState = hubQueue.AcquisitionsInProgress[index];
                     var holdStatus = acquisitionHoldState.Hold.Update(ServiceProvider, deltaTime);
                     if (holdStatus is not AcquisitionHoldStatus.Active)
                     {
                         hubQueue.AcquisitionsInProgress.RemoveAt(index);
-                        CompleteAcquisition(hub, acquisitionHoldState.Acquirer, pair.AcquisitionInformation, pair.Choice!, pair.ChoiceState, holdStatus);
+                        CompleteAcquisition(hub, acquisitionHoldState.Acquirer, pair.AcquisitionInformation, pair.Choice!, pair.ChoiceState, holdStatus, acquisitionHoldState.ReservedProvisions);
                     }
                 }
             }
@@ -291,15 +301,17 @@ internal class AcquisitionHubGroup
             : false;
     }
 
-    private void CompleteAcquisition(IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choice, AcquisitionChoiceState state, AcquisitionHoldStatus holdStatus)
+    private void CompleteAcquisition(IAcquisitionHub hub, IAcquirer acquirer, AcquisitionInformation acquisitionInformation, IAcquisitionDefinition choice, AcquisitionChoiceState state, AcquisitionHoldStatus holdStatus, IEnumerable<Provision> funds)
     {
-        if (holdStatus is AcquisitionHoldStatus.Released)
+        switch (holdStatus)
         {
-            state.TotalAcquisitions++;
+            case AcquisitionHoldStatus.Released:
+                state.TotalAcquisitions++;
+                break;
         }
 
         var success = holdStatus is AcquisitionHoldStatus.Released;
-        hub.ProcessAcquisition(new(acquirer, acquisitionInformation.PathType, acquisitionInformation.RootDefinition.Acquireable, choice.Acquireable, state.TotalAcquisitions, success, ServiceProvider));
+        hub.ProcessAcquisition(new(acquirer, acquisitionInformation.PathType, acquisitionInformation.RootDefinition.Acquireable, choice.Acquireable, state.TotalAcquisitions, funds, success, ServiceProvider));
 
         if (state.TryGetHubQueue(hub.Id, out var hubQueue))
         {

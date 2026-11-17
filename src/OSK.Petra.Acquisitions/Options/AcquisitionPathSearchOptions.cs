@@ -51,14 +51,14 @@ public readonly struct AcquisitionPathSearchOptions
     /// </summary>
     /// <returns>The options for chaining</returns>
     public AcquisitionPathSearchOptions IncludeUnavailable()
-        => Where(choice => choice.IsAvailable);
+        => Where(choice => !choice.IsAvailable);
 
     /// <summary>
     /// Includes incomplete acquisition choices in the search
     /// </summary>
     /// <returns>The options for chaining</returns>
     public AcquisitionPathSearchOptions IncludeIncomplete()
-        => Where(choice => choice.IsAvailable);
+        => Where(choice => !choice.IsComplete);
 
     /// <summary>
     /// Excludes complete acquisition choices from the search
@@ -72,10 +72,10 @@ public readonly struct AcquisitionPathSearchOptions
     /// </summary>
     /// <returns>The options for chaining</returns>
     public AcquisitionPathSearchOptions ExcludeIncomplete()
-        => Where(choice => !choice.IsComplete);
+        => Where(choice => choice.IsComplete);
 
     /// <summary>
-    /// Excludes availablie acquisition choices from the search
+    /// Excludes available acquisition choices from the search
     /// </summary>
     /// <returns>The options for chaining</returns>
     public AcquisitionPathSearchOptions ExcludeAvailable()
@@ -86,7 +86,7 @@ public readonly struct AcquisitionPathSearchOptions
     /// </summary>
     /// <returns>The options for chaining</returns>
     public AcquisitionPathSearchOptions ExcludeUnavailable()
-        => Where(choice => !choice.IsAvailable);
+        => Where(choice => choice.IsAvailable);
 
     /// <summary>
     /// Filters acquisition choices with the provided tiers
@@ -117,6 +117,7 @@ public readonly struct AcquisitionPathSearchOptions
 
         return new AcquisitionPathSearchOptions()
         {
+            TierFilter = TierFilter,
             PredicateFilters = PredicateFilters is null
                 ? [predicate]
                 : [.. PredicateFilters.Append(predicate)]

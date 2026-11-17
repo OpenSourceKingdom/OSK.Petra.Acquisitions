@@ -15,9 +15,11 @@ public interface IAcquisitionSystem
     /// </summary>
     /// <param name="hub">The hub to add to the system</param>
     /// <param name="state">The related state that should be associated with the hub</param>
+    /// <remarks>
     /// <list type="bullet">
     /// <item>Calling this endpoint is only necessary if setting a state with the hub is needed. <see cref="GetAcquisitionView(IAcquisitionHub, IAcquirer)"/> is meant to work with any <see cref="IAcquisitionHub"/> even if it's not been added prior</item>
     /// </list>
+    /// </remarks>
     void AddHub(IAcquisitionHub hub, AcquisitionHubState state);
 
     /// <summary>
@@ -26,7 +28,7 @@ public interface IAcquisitionSystem
     /// <param name="hub">The hub to get a view for</param>
     /// <param name="acquirer">The main acquirer the view request is generated for</param>
     /// <returns>The acquisition view for the hub tied to the acquirer requesting it</returns>
-    /// /// <remarks>
+    /// <remarks>
     /// 💡Notes:
     /// <list type="bullet">
     /// <item>The provided hub will be automatically added, with an empty state, to the system if it is not currently registered.</item>

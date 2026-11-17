@@ -47,7 +47,7 @@ public interface IAcquisitionChoice: IAcquisition
     IEnumerable<AcquisitionProgress> GetProgresses();
 
     /// <summary>
-    /// The provision expendeiture cost summary to start the next acquisition
+    /// The provision expenditure cost summary to start the next acquisition
     /// </summary>
     ProvisionExpenditureSummary NextExpenditure { get; }
 
@@ -62,16 +62,16 @@ public interface IAcquisitionChoice: IAcquisition
     /// <summary>
     /// Cancels an acquisition that is either queued or in progress
     /// </summary>
-    /// <returns>The result of the acuqisition cancellation</returns>
+    /// <returns>The result of the acquisition cancellation</returns>
     AcquisitionCancellationResult CancelAcquisition();
 
     /// <summary>
-    /// The collection of acquisition choices that follow this one
+    /// The collection of acquisition choices that precedes this one
     /// </summary>
     IReadOnlyCollection<IAcquisitionChoice> PreviousChoices { get; }
 
     /// <summary>
-    /// The collection of acquisition choices that precede this one
+    /// The collection of acquisition choices that follows this one
     /// </summary>
     IReadOnlyCollection<IAcquisitionChoice> NextChoices { get; }
 }
