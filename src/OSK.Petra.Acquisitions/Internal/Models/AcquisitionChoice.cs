@@ -40,9 +40,9 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
 
     public bool IsComplete => choiceDefinition.Configuration.MaxAcquisitionCount.HasValue && choiceState.TotalAcquisitions >= choiceDefinition.Configuration.MaxAcquisitionCount;
 
-    public IReadOnlyCollection<IAcquisitionChoice> PreviousChoices { get; init; } = [];
+    public IReadOnlyCollection<IAcquisitionChoice> PreviousChoices { get; internal set; } = [];
 
-    public IReadOnlyCollection<IAcquisitionChoice> NextChoices { get; init; } = [];
+    public IReadOnlyCollection<IAcquisitionChoice> NextChoices { get; internal set; } = [];
 
     #endregion
 
@@ -50,10 +50,7 @@ internal class AcquisitionChoice(AcquisitionHubGroup hubGroup, IAcquisitionHub h
 
     public override void Update(IEnumerable<Provision> provisions)
     {
-        IsAvailable = IsAvailable
-            ? true
-            : IsChoiceAvailable(pathAcquisition, choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
-
+        IsAvailable = IsChoiceAvailable(pathAcquisition, choiceDefinition, acquirer, hubGroup.AcquisitionState, hubGroup.ServiceProvider);
         NextExpenditure = GetExpenditureSummary(hubGroup, hub, acquirer, pathAcquisition, choiceDefinition, provisions);
     }
 

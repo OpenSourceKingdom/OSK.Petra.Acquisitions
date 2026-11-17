@@ -16,7 +16,7 @@ public class AcquisitionHubQueueState
     public int TotalQueuedAcquisitions => PendingAcquisitions.Count + AcquisitionsInProgress.Count;
 
     /// <summary>
-    /// THe states of the pending acquisitions
+    /// The states of the pending acquisitions
     /// </summary>
     public LinkedList<AcquisitionHoldState> PendingAcquisitions { get; init; } = [];
 
@@ -60,7 +60,7 @@ public class AcquisitionHubQueueState
     /// <summary>
     /// Removes the queue information for a given acquirer for the acquisition hub
     /// </summary>
-    /// <param name="acquirer">Thq acquireer that is trying to remove the acquisition</param>
+    /// <param name="acquirer">The acquirer that is trying to remove the acquisition</param>
     /// <returns>The hold state for the acquisition that was removed</returns>
     public AcquisitionHoldState? RemoveAcquisition(IAcquirer acquirer)
     {

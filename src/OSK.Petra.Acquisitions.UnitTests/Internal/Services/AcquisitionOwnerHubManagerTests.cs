@@ -6,7 +6,7 @@ using OSK.Petra.Acquisitions.Ports;
 
 namespace OSK.Petra.Acquisitions.UnitTests.Internal.Services;
 
-public class AcquisitionHubManagerTests
+public class AcquisitionOwnerHubManagerTests
 {
     #region Variables
 
@@ -19,7 +19,7 @@ public class AcquisitionHubManagerTests
 
     #region Constructors
 
-    public AcquisitionHubManagerTests()
+    public AcquisitionOwnerHubManagerTests()
     {
         _manager = new AcquisitionOwnerHubManager(_ownerId, _ownerState, _serviceProvider);
     }

@@ -12,7 +12,7 @@ public class AcquisitionRequirementContext
     #region Variables
 
     /// <summary>
-    /// The services associated wiht the acquisition process
+    /// The services associated with the acquisition process
     /// </summary>
     public IServiceProvider Services { get; }
 
@@ -45,7 +45,7 @@ public class AcquisitionRequirementContext
     #region Api
 
     /// <summary>
-    /// Attempts to get the progrewssion details for a given acquireable
+    /// Attempts to get the progression details for a given acquireable
     /// </summary>
     /// <param name="pathAcquisitionId">The acquisition root path id</param>
     /// <param name="acquireableId">The id for the thing being acquired</param>
@@ -53,9 +53,9 @@ public class AcquisitionRequirementContext
     /// <returns>Whether the details exist in the context</returns>
     public bool TryGetChoiceProgression(Guid pathAcquisitionId, Guid acquireableId, [NotNullWhen(true)] out AcquisitionProgressionDetails? tierProgression)
     {
-        if (_state.AcquisitionPathStates.TryGetValue(pathAcquisitionId, out var pathState))
+        if (_state.AcquisitionPathStates.TryGetValue(pathAcquisitionId, out var pathState) && pathState.ChoiceStates.TryGetValue(acquireableId, out var choiceState))
         {
-            tierProgression = new(acquireableId, pathState.ChoiceStates[acquireableId].TotalAcquisitions);
+            tierProgression = new(acquireableId, choiceState.TotalAcquisitions);
             return true;
         }
 

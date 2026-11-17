@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the progress for a given acquisition
 /// </summary>
-/// <param name="progress">The acuqiistion progress, from 0-1</param>
+/// <param name="progress">The acquisition progress, from 0-1</param>
 public readonly struct AcquisitionProgress(double progress)
 {
     #region Variables

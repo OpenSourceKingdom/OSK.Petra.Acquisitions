@@ -15,7 +15,7 @@ public class AcquisitionHubState
     public Guid HubId { get; init; }
 
     /// <summary>
-    /// The states of hte individual choices within the hub
+    /// The states of the individual choices within the hub
     /// </summary>
     public Dictionary<Guid, AcquisitionHubChoiceState> ChoiceStates { get; init; } = [];
 }

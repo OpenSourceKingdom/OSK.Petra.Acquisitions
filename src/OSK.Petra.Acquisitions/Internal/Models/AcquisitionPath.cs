@@ -17,9 +17,9 @@ internal class AcquisitionPath(AcquisitionHubGroup hubGroup, IAcquisitionHub hub
 
     public IAcquireable RootAcquireable => information.RootDefinition.Acquireable;
 
-    public int TotalTiers => information.Choices.Count;
+    public int TotalTiers => information.MaxTier;
 
-    public int TotalChoices => information.MaxTier;
+    public int TotalChoices => information.Choices.Count;
 
     public IEnumerable<IAcquisitionChoice> GetChoices(AcquisitionPathSearchOptions? searchOptions = null)
     {

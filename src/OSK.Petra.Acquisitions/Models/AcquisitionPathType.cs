@@ -11,7 +11,7 @@ public enum AcquisitionPathType
     Single,
 
     /// <summary>
-    /// The path is a copmlex path, containing multiple choices that potentially branch into many other paths. e.g. tech tree
+    /// The path is a complex path, containing multiple choices that potentially branch into many other paths. e.g. tech tree
     /// </summary>
     Multi
 }
